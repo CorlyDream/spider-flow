@@ -134,32 +134,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.spiderflow</groupId>
-				<artifactId>spider-flow-proxypool</artifactId>
-				<version>${spider-flow.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.spiderflow</groupId>
 				<artifactId>spider-flow-mongodb</artifactId>
 				<version>${spider-flow.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.spiderflow</groupId>
-				<artifactId>spider-flow-redis</artifactId>
-				<version>${spider-flow.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.spiderflow</groupId>
 				<artifactId>spider-flow-ocr</artifactId>
-				<version>${spider-flow.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.spiderflow</groupId>
-				<artifactId>spider-flow-oss</artifactId>
-				<version>${spider-flow.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.spiderflow</groupId>
-				<artifactId>spider-flow-mailbox</artifactId>
 				<version>${spider-flow.version}</version>
 			</dependency>
 		</dependencies>
@@ -168,5 +148,23 @@
 		<module>spider-flow-api</module>
 		<module>spider-flow-core</module>
 		<module>spider-flow-web</module>
+		<module>spider-flow-selenium</module>
+		<module>spider-flow-mongodb</module>
+		<module>spider-flow-ocr</module>
 	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
+				<configuration>
+					<compilerArgument>-parameters</compilerArgument>
+					<encoding>UTF-8</encoding>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
