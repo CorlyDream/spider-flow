@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import sun.awt.SunHints;
 
 @Component
 public class MongoCollectionExtension implements FunctionExtension{
