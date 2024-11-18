@@ -185,7 +185,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 
 			//是否验证TLS证书,默认是验证
 			if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
-				request.validateTLSCertificates(false);
+//				request.validateTLSCertificates(false);
 				logger.debug("设置TLS证书验证：{}", false);
 			}
 			SpiderNode root = context.getRootNode();

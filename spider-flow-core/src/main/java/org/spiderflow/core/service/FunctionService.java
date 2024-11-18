@@ -10,6 +10,7 @@ import org.spiderflow.core.script.ScriptManager;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+
 import javax.script.ScriptEngine;
 import java.io.Serializable;
 
@@ -25,11 +26,11 @@ public class FunctionService extends ServiceImpl<FunctionMapper, Function> {
     private void init(){
         try {
             ScriptManager.lock();
-            ScriptManager.clearFunctions();
+        ScriptManager.clearFunctions();
             ScriptEngine engine = ScriptManager.createEngine();
-            super.list().forEach(function -> {
+        super.list().forEach(function -> {
                 ScriptManager.registerFunction(engine,function.getName(),function.getParameter(),function.getScript());
-            });
+        });
             ScriptManager.setScriptEngine(engine);
         } finally {
             ScriptManager.unlock();
@@ -38,19 +39,19 @@ public class FunctionService extends ServiceImpl<FunctionMapper, Function> {
 
     public String saveFunction(Function entity) {
         try {
-            ScriptManager.validScript(entity.getName(),entity.getParameter(),entity.getScript());
+            ScriptManager.validScript(entity.getName(), entity.getParameter(), entity.getScript());
             super.saveOrUpdate(entity);
             init();
             return null;
         } catch (Exception e) {
-            logger.error("保存自定义函数出错",e);
+            logger.error("保存自定义函数出错", e);
             return ExceptionUtils.getStackTrace(e);
         }
     }
 
     @Override
     public boolean removeById(Serializable id) {
-        boolean ret =  super.removeById(id);
+        boolean ret = super.removeById(id);
         init();
         return ret;
     }

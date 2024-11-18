@@ -75,7 +75,7 @@ public class MongoCollectionExtension implements FunctionExtension{
 	@Comment("mongodb查找总数")
 	@Example("${mongodb.aliasName.collectionName.count({key : value})}")
 	public static long count(MongoCollection<Document> collection,Map<String,Object> query){
-		return collection.count(new Document(query));
+		return collection.countDocuments(new Document(query));
 	}
 	
 	@Comment("mongodb删除数据")

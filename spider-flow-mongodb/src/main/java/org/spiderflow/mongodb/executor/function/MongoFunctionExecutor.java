@@ -3,6 +3,7 @@ package org.spiderflow.mongodb.executor.function;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mongodb.client.MongoClient;
 import org.bson.Document;
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.executor.FunctionExecutor;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 
 @Component

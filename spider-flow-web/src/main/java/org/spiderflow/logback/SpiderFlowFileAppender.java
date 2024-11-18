@@ -38,15 +38,11 @@ public class SpiderFlowFileAppender extends FileAppender<ILoggingEvent> {
         if (byteArray == null || byteArray.length == 0)
             return;
 
-        lock.lock();
-        try {
-            os.write(byteArray);
-            if (isImmediateFlush()) {
-                os.flush();
-            }
-        } finally {
-            lock.unlock();
+        os.write(byteArray);
+        if (isImmediateFlush()) {
+            os.flush();
         }
+
     }
 
 }

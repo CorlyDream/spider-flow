@@ -1,5 +1,6 @@
 package org.spiderflow.mongodb.web;
 
+import com.mongodb.client.MongoClient;
 import org.spiderflow.common.CURDController;
 import org.spiderflow.executor.PluginConfig;
 import org.spiderflow.model.JsonBean;
@@ -11,7 +12,6 @@ import org.spiderflow.mongodb.utils.MongoDBUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoIterable;
 
 @RestController

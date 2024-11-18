@@ -20,8 +20,10 @@ public class HtmlUnitDriverProvider implements DriverProvider {
 
     @Override
     public WebDriver getWebDriver(SpiderNode node, String proxyStr) {
-        DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
-        capabilities.setJavascriptEnabled(!"1".equals(node.getStringJsonValue(JAVASCRIPT_DISABLED)));
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setVersion("Chrome");
+        boolean enableJavascript = "1".equals(node.getStringJsonValue(JAVASCRIPT_DISABLED));
+        capabilities.setCapability(HtmlUnitDriver.JAVASCRIPT_ENABLED, enableJavascript);
         if (StringUtils.isNotBlank(proxyStr)) {
             Proxy proxy = new Proxy();
             proxy.setHttpProxy(proxyStr);

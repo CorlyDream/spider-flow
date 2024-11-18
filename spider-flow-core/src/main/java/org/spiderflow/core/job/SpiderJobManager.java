@@ -62,8 +62,10 @@ public class SpiderJobManager {
 			CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(spiderFlow.getCron()).withMisfireHandlingInstructionDoNothing();
 			
 			CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(spiderFlow.getId())).withSchedule(cronScheduleBuilder).build();
-			
-			return scheduler.scheduleJob(job,trigger);
+
+			Date nextDate = scheduler.scheduleJob(job,trigger);
+			logger.info("addJob {} nextDate {} cron {} id {}", spiderFlow.getName(), nextDate, spiderFlow.getCron(), spiderFlow.getId());
+			return nextDate;
 		} catch (SchedulerException e) {
 			logger.error("创建定时任务出错",e);
 			return null;
@@ -78,6 +80,7 @@ public class SpiderJobManager {
 	
 	public boolean remove(String id){
 		try {
+			logger.info("remove job {}", id);
 			scheduler.deleteJob(getJobKey(id));
 			return true;
 		} catch (SchedulerException e) {

@@ -46,7 +46,7 @@ public class ChromeDriverProvider implements DriverProvider {
         }
         //无头模式
         if("1".equals(node.getStringJsonValue(HEADLESS))){
-            options.setHeadless(true);
+            options.addArguments("--headless=new");
         }
         //禁用沙盒模式
         if(!"1".equals(node.getStringJsonValue(SANDBOX))){

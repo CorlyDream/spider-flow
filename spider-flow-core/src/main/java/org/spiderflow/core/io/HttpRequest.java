@@ -112,12 +112,7 @@ public class HttpRequest {
 		return this;
 	}
 	
-	@SuppressWarnings("deprecation")
-	public HttpRequest validateTLSCertificates(boolean value){
-		this.connection.validateTLSCertificates(value);
-		return this;
-	}
-	
+
 	public HttpResponse execute() throws IOException{
 		this.connection.ignoreContentType(true);
 		this.connection.ignoreHttpErrors(true);

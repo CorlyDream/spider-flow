@@ -44,32 +44,37 @@ jobs:
         id: extract_version
         run: echo "VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_ENV
 
-      - name: Determine if prerelease
-        id: prerelease_check
-        run: |
-          if [[ "${{ env.VERSION }}" == *"SNAPSHOT"* ]]; then
-            echo "PRERELEASE=true" >> $GITHUB_ENV
-          else
-            echo "PRERELEASE=false" >> $GITHUB_ENV
-          fi
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
-          draft: false
-          prerelease: ${{ env.PRERELEASE }}
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: spider-flow-web/target/spider-flow.jar
-          asset_name: spider-flow.jar
-          asset_content_type: application/java-archive
+#
+#      - name: Determine if prerelease
+#        id: prerelease_check
+#        run: |
+#          if [[ "${{ env.VERSION }}" == *"SNAPSHOT"* ]]; then
+#            echo "PRERELEASE=true" >> $GITHUB_ENV
+#          else
+#            echo "PRERELEASE=false" >> $GITHUB_ENV
+#          fi
+#
+#      - name: Create GitHub Release
+#        id: create_release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: v${{ env.VERSION }}
+#          release_name: Release v${{ env.VERSION }}
+#          draft: false
+#          prerelease: ${{ env.PRERELEASE }}
+#
+#      - name: Upload Release Asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: spider-flow-web/target/spider-flow.jar
+#          asset_name: spider-flow.jar
+#          asset_content_type: application/java-archive

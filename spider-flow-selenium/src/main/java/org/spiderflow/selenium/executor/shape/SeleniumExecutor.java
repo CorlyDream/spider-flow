@@ -1,5 +1,6 @@
 package org.spiderflow.selenium.executor.shape;
 
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -19,7 +20,6 @@ import org.spiderflow.selenium.utils.SeleniumResponseHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.List;

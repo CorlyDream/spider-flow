@@ -147,6 +147,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	public void start(String id){
 		spiderJobManager.remove(id);
 		SpiderFlow spiderFlow = getById(id);
+		spiderFlow.setEnabled("1"); // 下面才会执行
 		Date nextExecuteTime = spiderJobManager.addJob(spiderFlow);
 		if (nextExecuteTime != null) {
 			spiderFlow.setNextExecuteTime(nextExecuteTime);

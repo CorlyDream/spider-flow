@@ -46,7 +46,7 @@ public class FireFoxDriverProvider implements DriverProvider {
 		}
 		//无头模式
 		if ("1".equals(node.getStringJsonValue(HEADLESS))) {
-			options.setHeadless(true);
+			options.addArguments("--headless=new");
 		}
 		// 是否启用JS,firefox必须启用javascript
 		//profile.setPreference("javascript.enabled",!"1".equals(node.getStringJsonValue(JAVASCRIPT_DISABLED)));
