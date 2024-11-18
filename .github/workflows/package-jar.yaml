@@ -49,11 +49,11 @@ jobs:
         with:
           name: spider-flow-web
           path: spider-flow-web/target/spider-flow.jar
-#
-#      - name: Publish to GitHub Packages Apache Maven
-#        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #
 #      - name: Determine if prerelease
 #        id: prerelease_check
