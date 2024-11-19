@@ -17,7 +17,8 @@ public class ChromeDriverProvider implements DriverProvider {
 
     @Value("${selenium.driver.chrome:null}")
     private String chromeDriverPath;
-
+    @Value("${selenium.binary.chrome:null}")
+    private String chromeBinaryPath;
     @Override
     public String support() {
         return chromeDriverPath != null ? "chrome" : null;
@@ -27,6 +28,7 @@ public class ChromeDriverProvider implements DriverProvider {
     public WebDriver getWebDriver(SpiderNode node, String proxyStr) {
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         ChromeOptions options = new ChromeOptions();
+        options.setBinary(chromeBinaryPath);
         String userAgent = node.getStringJsonValue(USER_AGENT);
         //设置User-Agent
         if(StringUtils.isNotBlank(userAgent)){

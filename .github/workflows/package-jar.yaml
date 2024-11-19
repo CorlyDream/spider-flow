@@ -45,3 +45,4 @@ jobs:
         with:
           name: spider-flow.jar
           path: spider-flow-web/target/spider-flow.jar
+          retention-days: 30
