@@ -1,6 +1,8 @@
 package org.spiderflow.selenium.driver;
 
 import org.apache.commons.lang3.StringUtils;
+import org.htmlunit.BrowserVersion;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -21,9 +23,11 @@ public class HtmlUnitDriverProvider implements DriverProvider {
     @Override
     public WebDriver getWebDriver(SpiderNode node, String proxyStr) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setVersion("Chrome");
-        boolean enableJavascript = "1".equals(node.getStringJsonValue(JAVASCRIPT_DISABLED));
-        capabilities.setCapability(HtmlUnitDriver.JAVASCRIPT_ENABLED, enableJavascript);
+        capabilities.setBrowserName("htmlunit");
+        capabilities.setVersion(BrowserVersion.CHROME.getNickname());
+        capabilities.setPlatform(Platform.WIN10);
+        boolean disableJs = "1".equals(node.getStringJsonValue(JAVASCRIPT_DISABLED));
+        capabilities.setCapability(HtmlUnitDriver.JAVASCRIPT_ENABLED, !disableJs);
         if (StringUtils.isNotBlank(proxyStr)) {
             Proxy proxy = new Proxy();
             proxy.setHttpProxy(proxyStr);
