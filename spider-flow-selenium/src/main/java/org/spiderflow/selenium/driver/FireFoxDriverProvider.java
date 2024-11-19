@@ -20,6 +20,8 @@ public class FireFoxDriverProvider implements DriverProvider {
 
 	@Value("${selenium.driver.firefox:null}")
 	private String firefoxDriverPath;
+	@Value("${selenium.binary.firefox:null}")
+	private String firefoxBinaryPath;
 
 	@Override
 	public String support() {
@@ -30,6 +32,7 @@ public class FireFoxDriverProvider implements DriverProvider {
 	public WebDriver getWebDriver(SpiderNode node, String proxyStr) {
 		System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
 		FirefoxOptions options = new FirefoxOptions();
+		options.setBinary(firefoxBinaryPath);
 		FirefoxProfile profile = new FirefoxProfile();
 		if (StringUtils.isNotBlank(proxyStr)) {
 			String[] hp = proxyStr.split(":");
