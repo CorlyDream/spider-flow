@@ -75,6 +75,11 @@ public class ChromeDriverProvider implements DriverProvider {
         if("1".equals(node.getStringJsonValue(MAXIMIZED))){
             options.addArguments("--start-maximized");
         }
+        options.addArguments("--disable-blink-features=AutomationControlled");
+
+        options.setExperimentalOption("excludeSwitches", Arrays.asList("enable-automation"));
+
+        options.setExperimentalOption("useAutomationExtension", false);
         //设置其他参数
 		String arguments = node.getStringJsonValue(ARGUMENTS);
         if(StringUtils.isNotBlank(arguments)){

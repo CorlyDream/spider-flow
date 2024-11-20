@@ -101,6 +101,13 @@ public class SpiderContext extends HashMap<String, Object>{
 
 	public void setRootNode(SpiderNode rootNode) {
 		this.rootNode = rootNode;
+		List<Map<String, String>> listJsonValue = rootNode.getListJsonValue("cookie-name", "cookie-value");
+		if (listJsonValue.isEmpty()) {
+			return;
+		}
+		for (Map<String, String> map : listJsonValue) {
+			cookieContext.put(map.get("cookie-name"), map.get("cookie-value"));
+		}
 	}
 	
 	public String getId() {

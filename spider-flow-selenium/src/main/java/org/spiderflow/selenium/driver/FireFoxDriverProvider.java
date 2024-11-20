@@ -39,7 +39,6 @@ public class FireFoxDriverProvider implements DriverProvider {
 			profile.setPreference("network.proxy.type", 1);
 			profile.setPreference("network.proxy.http", hp[0]);
 			profile.setPreference("network.proxy.http_port", NumberUtils.toInt(hp[1], 8080));
-			profile.setPreference("network.proxy.no_proxies_on", "");
 		}
 
 		//设置User-Agent
