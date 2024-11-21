@@ -6,6 +6,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.logging.LogType;
@@ -35,10 +36,7 @@ public class FireFoxDriverProvider implements DriverProvider {
 	public WebDriver getWebDriver(SpiderNode node, String proxyStr) {
 		System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
 		FirefoxOptions options = new FirefoxOptions();
-		LoggingPreferences logPrefs = new LoggingPreferences();
-		logPrefs.enable(LogType.BROWSER, Level.ALL);
-		logPrefs.enable(LogType.DRIVER, Level.ALL);
-		options.setCapability("moz:loggingPrefs", logPrefs);
+		options.setLogLevel(FirefoxDriverLogLevel.TRACE);
 		options.setBinary(firefoxBinaryPath);
 		FirefoxProfile profile = new FirefoxProfile();
 		if (StringUtils.isNotBlank(proxyStr)) {
