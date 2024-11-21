@@ -8,12 +8,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 @Component
 public class FireFoxDriverProvider implements DriverProvider {
@@ -32,6 +35,10 @@ public class FireFoxDriverProvider implements DriverProvider {
 	public WebDriver getWebDriver(SpiderNode node, String proxyStr) {
 		System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
 		FirefoxOptions options = new FirefoxOptions();
+		LoggingPreferences logPrefs = new LoggingPreferences();
+		logPrefs.enable(LogType.BROWSER, Level.ALL);
+		logPrefs.enable(LogType.DRIVER, Level.ALL);
+		options.setCapability("moz:loggingPrefs", logPrefs);
 		options.setBinary(firefoxBinaryPath);
 		FirefoxProfile profile = new FirefoxProfile();
 		if (StringUtils.isNotBlank(proxyStr)) {

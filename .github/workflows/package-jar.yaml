@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - upgrade-version
+      - firfox-debug
     paths-ignore:
       - 'db/**'
       - '**.md'
