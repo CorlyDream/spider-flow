@@ -2,31 +2,31 @@ package org.spiderflow.selenium.driver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
 
 @Component
 public class FireFoxDriverProvider implements DriverProvider {
+	private static final Logger log = LoggerFactory.getLogger(FireFoxDriverProvider.class);
 
-	@Value("${selenium.driver.firefox:null}")
+	@Value("${selenium.driver.firefox:}")
 	private String firefoxDriverPath;
-	@Value("${selenium.binary.firefox:null}")
+	@Value("${selenium.binary.firefox:}")
 	private String firefoxBinaryPath;
-
+	@Value("${selenium.driver.firefox.remote:}")
+	private String remoteDriverUrl;
 	@Override
 	public String support() {
 		return firefoxDriverPath != null ? "firefox" : null;
@@ -34,10 +34,19 @@ public class FireFoxDriverProvider implements DriverProvider {
 
 	@Override
 	public WebDriver getWebDriver(SpiderNode node, String proxyStr) {
-		System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
 		FirefoxOptions options = new FirefoxOptions();
-		options.setLogLevel(FirefoxDriverLogLevel.TRACE);
-		options.setBinary(firefoxBinaryPath);
+		URL remoteAddress = null;
+		if (StringUtils.isNotBlank(remoteDriverUrl)) {
+            try {
+                remoteAddress = new URL(remoteDriverUrl);
+            } catch (MalformedURLException e) {
+				log.error("Invalid remote driver URL: {}", remoteDriverUrl, e);
+                throw new RuntimeException(e);
+            }
+        }else {
+			System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
+			options.setBinary(firefoxBinaryPath);
+		}
 		FirefoxProfile profile = new FirefoxProfile();
 		if (StringUtils.isNotBlank(proxyStr)) {
 			String[] hp = proxyStr.split(":");
@@ -53,7 +62,7 @@ public class FireFoxDriverProvider implements DriverProvider {
 		}
 		//无头模式
 		if ("1".equals(node.getStringJsonValue(HEADLESS))) {
-			options.addArguments("--headless=new");
+			options.addArguments("--headless");
 		}
 		// 是否启用JS,firefox必须启用javascript
 		//profile.setPreference("javascript.enabled",!"1".equals(node.getStringJsonValue(JAVASCRIPT_DISABLED)));
@@ -91,7 +100,12 @@ public class FireFoxDriverProvider implements DriverProvider {
 			});
 		}
 		options.setProfile(profile);
-		FirefoxDriver driver = new FirefoxDriver(options);
+		RemoteWebDriver driver = null;
+		if (remoteAddress != null) {
+			driver = new RemoteWebDriver(remoteAddress, options);
+		}else {
+			driver = new FirefoxDriver(options);
+		}
 		//最大化
 		if ("1".equals(node.getStringJsonValue(MAXIMIZED))) {
 			driver.manage().window().maximize();
