@@ -23,8 +23,12 @@ public class HttpRequest {
 	}
 	
 	public HttpRequest url(String url){
+		this.url(url, Method.GET);
+		return this;
+	}
+	public HttpRequest url(String url, Method method){
 		this.connection = Jsoup.connect(url);
-		this.connection.method(Method.GET);
+		this.connection.method(method);
 		this.connection.timeout(60000);
 		return this;
 	}

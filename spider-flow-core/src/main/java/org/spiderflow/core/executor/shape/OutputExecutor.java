@@ -6,9 +6,12 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.jdbc.SQL;
+import org.jsoup.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.core.io.HttpRequest;
+import org.spiderflow.core.io.HttpResponse;
 import org.spiderflow.core.serializer.FastJsonSerializer;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
@@ -17,6 +20,7 @@ import org.spiderflow.io.SpiderResponse;
 import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +47,10 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 
 	public static final String OUTPUT_CSV = "output-csv";
 
+	public static final String OUTPUT_HTTP = "output-http";
+
+	public static final String HTTP_URL = "httpUrl";
+
 	public static final String TABLE_NAME = "tableName";
 
 	public static final String CSV_NAME = "csvName";
@@ -64,12 +72,13 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 		boolean outputAll = "1".equals(node.getStringJsonValue(OUTPUT_ALL));
 		boolean databaseFlag = "1".equals(node.getStringJsonValue(OUTPUT_DATABASE));
 		boolean csvFlag = "1".equals(node.getStringJsonValue(OUTPUT_CSV));
+		boolean httpFlag = "1".equals(node.getStringJsonValue(OUTPUT_HTTP));
 		if (outputAll) {
 			outputAll(output, variables);
 		}
 		List<Map<String, String>> outputs = node.getListJsonValue(OUTPUT_NAME, OUTPUT_VALUE);
 		Map<String, Object> outputData = null;
-		if (databaseFlag || csvFlag) {
+		if (databaseFlag || csvFlag || httpFlag) {
 			outputData = new HashMap<>(outputs.size());
 		}
 		for (Map<String, String> item : outputs) {
@@ -84,7 +93,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 				logger.error("输出{}出错，异常信息：{}", outputName,e);
 			}
 			output.addOutput(outputName, value);
-			if ((databaseFlag || csvFlag) && value != null) {
+			if ((databaseFlag || csvFlag || httpFlag) && value != null) {
 				outputData.put(outputName, value.toString());
 			}
 		}
@@ -102,6 +111,10 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 		if (csvFlag) {
 			String csvName = node.getStringJsonValue(CSV_NAME);
 			outputCSV(node, context, csvName, outputData);
+		}
+		if (httpFlag) {
+			String url = node.getStringJsonValue(HTTP_URL);
+			outputHttp(url, outputData);
 		}
 		context.addOutput(output);
 	}
@@ -132,6 +145,25 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			}
 			//输出信息
 			output.addOutput(item.getKey(), item.getValue());
+		}
+	}
+
+	private void outputHttp(String url, Map<String, Object> data) {
+		if (StringUtils.isBlank(url) || data == null || data.isEmpty()) {
+			return;
+		}
+		try {
+			HttpRequest request = HttpRequest.create().url(url, Connection.Method.POST);
+			request.contentType(MediaType.APPLICATION_JSON_VALUE);
+			String dataStr = JSON.toJSONString(data);
+			request.data(dataStr);
+			logger.info("outputHttp输出数据 url {} post data {}", url, dataStr);
+			HttpResponse resp = request.execute();
+			if (resp.getStatusCode() != 200) {
+				logger.error("outputHttp输出出错，url {} statusCode {}", url, resp.getStatusCode());
+			}
+		} catch (Exception e) {
+			logger.error("outputHttp输出异常，url {} ", url, e);
 		}
 	}
 

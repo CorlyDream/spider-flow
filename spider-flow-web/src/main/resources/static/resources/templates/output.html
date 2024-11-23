@@ -44,6 +44,7 @@
 						<div class="layui-input-block">
 							<input type="checkbox" target-div="databaseDiv" title="输出到数据库" value="output-database" lay-skin="primary" {{d.data.object['output-database'] == '1' ? 'checked' : ''}} lay-filter="targetCheck"/>
 							<input type="checkbox" class="oCheckbox" target-div="csvDiv" title="输出到CSV文件" value="output-csv" lay-skin="primary" {{d.data.object['output-csv'] == '1' ? 'checked' : ''}} lay-filter="targetCheck"/>
+							<input type="checkbox" class="oCheckbox" target-div="httpDiv" title="POST 输出到 http 接口" value="output-http" lay-skin="primary" {{d.data.object['output-http'] == '1' ? 'checked' : ''}} lay-filter="targetCheck"/>
 						</div>
 					</div>
 				</div>
@@ -78,6 +79,11 @@
 						</select>
 					</div>
 				</div>
+                <div class="layui-col-md2 httpDiv" {{d.data.object['output-http'] == '1' ? '' : 'style="display: none;"'}}>
+                    <div class="layui-form-item">
+                        <input type="text" name="httpUrl" placeholder="请输接口 URL 地址" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.httpUrl}}">
+                    </div>
+                </div>
 			</div>
 			<table class="layui-table" id="spider-output" data-cell="{{=d.cell.id}}" data-keys="output-name,output-value"></table>
     		<hr>
