@@ -54,9 +54,10 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteSQLExecutor.class);
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	public Object execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
 		String sql = node.getStringJsonValue(SQL);
+		Object rs = null;
 		if (StringUtils.isBlank(dsId)) {
 			logger.warn("数据源ID为空！");
 		} else if (StringUtils.isBlank(sql)) {
@@ -70,7 +71,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 				Object sqlObject = ExpressionUtils.execute(sql, variables);
 				if(sqlObject == null){
 					logger.warn("获取的sql为空！");
-					return;
+					return null;
 				}
 				sql = sqlObject.toString();
 				context.pause(node.getNodeId(),"common",SQL,sql);
@@ -102,17 +103,17 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 				boolean isStream = "1".equals(node.getStringJsonValue(SELECT_RESULT_STREAM));
 				try {
 					if (isStream) {
-						variables.put("rs", template.queryForRowSet(sql, params));
+						rs = template.queryForRowSet(sql, params);
 					} else {
-						variables.put("rs", template.queryForList(sql, params));
+						rs = template.queryForList(sql, params);
 					}
+					variables.put("rs", rs);
 				} catch (Exception e) {
 					variables.put("rs", null);
 					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_ONE.equals(statementType)) {
-				Map<String, Object> rs;
 				try {
 					rs = template.queryForMap(sql, params);
 					variables.put("rs", rs);
@@ -122,7 +123,6 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_INT.equals(statementType)) {
-				Integer rs;
 				try {
 					rs = template.queryForObject(sql, params, Integer.class);
 					rs = rs == null ? 0 : rs;
@@ -141,14 +141,15 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 						  当参数不为数组或List时，自动转为Object[]
 						  当数组或List长度不足时，自动取最后一项补齐
 						 */
-						int[] rs = template.batchUpdate(sql, convertParameters(params, parameterSize));
-						if (rs.length > 0) {
-							updateCount = Arrays.stream(rs).sum();
+						int[] updateRs = template.batchUpdate(sql, convertParameters(params, parameterSize));
+						if (updateRs.length > 0) {
+							updateCount = Arrays.stream(updateRs).sum();
 						}
 					} else {
 						updateCount = template.update(sql, params);
 					}
 					variables.put("rs", updateCount);
+					rs = updateCount;
 				} catch (Exception e) {
 					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 					variables.put("rs", -1);
@@ -164,6 +165,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 						return ps;
 					}, keyHolder);
 					variables.put("rs", keyHolder.getKey().intValue());
+					rs = keyHolder;
 				} catch (Exception e) {
 					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 					variables.put("rs", -1);
@@ -171,6 +173,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 				}
 			}
 		}
+		return rs;
 	}
 	private List<Object[]> convertParameters(Object[] params, int length) {
 		List<Object[]> result = new ArrayList<>(length);

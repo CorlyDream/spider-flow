@@ -1,12 +1,14 @@
 package org.spiderflow.io;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.annotation.Example;
 
 import com.alibaba.fastjson.JSON;
+import org.spiderflow.model.CookieDto;
 
 public interface SpiderResponse {
 
@@ -30,6 +32,10 @@ public interface SpiderResponse {
 	@Comment("获取cookies")
 	@Example("${resp.cookies}")
 	Map<String,String> getCookies();
+
+	@Comment("获取cookie列表")
+	@Example("${resp.cookieList}")
+	List<CookieDto> getCookieList();
 
 	@Comment("获取headers")
 	@Example("${resp.headers}")

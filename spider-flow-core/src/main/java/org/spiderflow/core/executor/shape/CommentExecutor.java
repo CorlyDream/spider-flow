@@ -11,8 +11,8 @@ import java.util.Map;
 public class CommentExecutor implements ShapeExecutor{
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-		
+	public Object execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+		return null;
 	}
 
 	@Override

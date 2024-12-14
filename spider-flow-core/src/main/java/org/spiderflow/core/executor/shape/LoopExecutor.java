@@ -21,9 +21,6 @@ public class LoopExecutor implements ShapeExecutor{
 
 	public static final String LOOP_END = "loopEnd";
 	
-	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-	}
 
 	@Override
 	public String supportShape() {

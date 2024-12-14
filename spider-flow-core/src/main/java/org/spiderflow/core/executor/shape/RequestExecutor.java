@@ -114,7 +114,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 	}
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+	public Object execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		CookieContext cookieContext = context.getCookieContext();
 		String sleepCondition = node.getStringJsonValue(SLEEP);
 		if(StringUtils.isNotBlank(sleepCondition)){
@@ -146,6 +146,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 		//重试间隔时间，单位毫秒
 		int retryInterval = NumberUtils.toInt(node.getStringJsonValue(RETRY_INTERVAL), 0);
         boolean successed = false;
+		HttpResponse response = null;
 		for (int i = 0; i < retryCount && !successed; i++) {
 			HttpRequest request = HttpRequest.create();
 			//设置请求url
@@ -161,7 +162,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 				synchronized (bloomFilter){
 					if(bloomFilter.mightContain(MD5FunctionExecutor.string(url))){
 						logger.info("过滤重复URL:{}",url);
-						return;
+						return response;
 					}
 				}
 			}
@@ -256,7 +257,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 			}
 			Throwable exception = null;
 			try {
-				HttpResponse response = request.execute();
+				response = request.execute();
                 successed = response.getStatusCode() == 200;
                 if(successed){
                 	if(bloomFilter != null){
@@ -314,6 +315,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
                 }
 			}
 		}
+		return response;
 	}
 	
 	private List<InputStream> setRequestFormParameter(SpiderNode node, HttpRequest request,List<Map<String, String>> parameters,SpiderContext context,Map<String,Object> variables){

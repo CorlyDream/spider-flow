@@ -33,7 +33,7 @@ public class ProcessExecutor implements ShapeExecutor{
 	private Spider spider;
 	
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+	public Object execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		String flowId = node.getStringJsonValue("flowId");
 		SpiderFlow spiderFlow = spiderFlowService.getById(flowId);
 		if(spiderFlow != null){
@@ -43,6 +43,7 @@ public class ProcessExecutor implements ShapeExecutor{
 		}else{
 			logger.info("执行子流程:{}失败，找不到该子流程", flowId);
 		}
+		return null;
 	}
 
 	@Override

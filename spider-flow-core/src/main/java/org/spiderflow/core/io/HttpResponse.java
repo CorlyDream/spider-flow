@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.spiderflow.io.SpiderResponse;
+import org.spiderflow.model.CookieDto;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,7 +73,12 @@ public class HttpResponse implements SpiderResponse{
 	public Map<String,String> getCookies(){
 		return response.cookies();
 	}
-	
+
+	@Override
+	public List<CookieDto> getCookieList() {
+		return List.of();
+	}
+
 	@Override
 	public Map<String,String> getHeaders(){
 		return response.headers();

@@ -76,3 +76,18 @@ CREATE TABLE `sp_flow_notice` (
   `end_notice` char(1) DEFAULT '0' COMMENT '流程结束通知:1:开启通知,0:关闭通知',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '爬虫任务通知表';
+
+DROP TABLE IF EXISTS `sp_flow_cookies`;
+CREATE TABLE `sp_flow_cookies` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `flow_id` varchar(32) DEFAULT '' COMMENT '任务ID, sp_flow表的id, 空的时候表示全局生效',
+  `name` varchar(128) DEFAULT '' COMMENT 'cookie名',
+  `value` varchar(1024) DEFAULT '' COMMENT 'cookie值',
+  `domain` varchar(128) DEFAULT '' COMMENT 'cookie域名',
+  `path` varchar(255) DEFAULT '' COMMENT 'cookie路径',
+  `expiry` datetime NOT NULL COMMENT 'cookie过期时间',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `flow_id_name` (`flow_id`,`domain`(25),`name`(25))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='爬虫任务持久化cookie表';

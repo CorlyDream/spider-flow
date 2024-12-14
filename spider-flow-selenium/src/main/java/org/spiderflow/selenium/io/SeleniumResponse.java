@@ -4,106 +4,125 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.io.SpiderResponse;
+import org.spiderflow.model.CookieDto;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class SeleniumResponse implements SpiderResponse{
-	
-	private WebDriver driver;
+public class SeleniumResponse implements SpiderResponse {
 
-	private Actions actionsObj;
-	
-	public SeleniumResponse(WebDriver driver){
-		this.driver = driver;
-	}
-	
-	@Override
-	public int getStatusCode() {
-		return 0;
-	}
+    private static final Logger log = LoggerFactory.getLogger(SeleniumResponse.class);
+    private WebDriver driver;
 
-	@Override
-	public String getTitle() {
-		return driver.getTitle();
-	}
+    private Actions actionsObj;
 
-	@Override
-	public byte[] getBytes() {
-		return null;
-	}
-	
-	@Override
-	public String getHtml() {
-		return driver.getPageSource();
-	}
-	
-	@Override
-	public Map<String, String> getCookies() {
-		Set<Cookie> cookies = driver.manage().getCookies();
-		Map<String,String> cookieMap = new HashMap<>();
-		if(cookies != null){
-			for (Cookie cookie : cookies) {
-				cookieMap.put(cookie.getName(), cookie.getValue());
-			}
-		}
-		return cookieMap;
-	}
-	
-	@Override
-	public Map<String, String> getHeaders() {
-		return null;
-	}
+    public SeleniumResponse(WebDriver driver) {
+        this.driver = driver;
+    }
 
-	@Override
-	public String getContentType() {
-		return null;
-	}
+    @Override
+    public int getStatusCode() {
+        return 0;
+    }
 
-	@Override
-	public String getUrl() {
-		return driver.getCurrentUrl();
-	}
+    @Override
+    public String getTitle() {
+        return driver.getTitle();
+    }
 
-	public WebDriver getDriver() {
-		return driver;
-	}
+    @Override
+    public byte[] getBytes() {
+        return null;
+    }
 
-	public SeleniumResponse switchTo(int index){
-		driver.switchTo().frame(index);
-		return this;
-	}
-	public SeleniumResponse switchTo(String name){
-		driver.switchTo().frame(name);
-		return this;
-	}
-	public SeleniumResponse switchTo(WebElement element){
-		driver.switchTo().frame(element);
-		return this;
-	}
+    @Override
+    public String getHtml() {
+        return driver.getPageSource();
+    }
 
-	public SeleniumResponse switchToDefault(){
-		driver.switchTo().defaultContent();
-		return this;
-	}
+    @Override
+    public Map<String, String> getCookies() {
+        Set<Cookie> cookies = driver.manage().getCookies();
+        Map<String, String> cookieMap = new HashMap<>();
+        for (Cookie cookie : cookies) {
+            cookieMap.put(cookie.getName(), cookie.getValue());
+        }
+        return cookieMap;
+    }
 
-	public void quit(){
-		try {
-			driver.quit();
-		} catch (Exception ignored) {
-		}
-	}
+    @Override
+    public List<CookieDto> getCookieList() {
+        Set<Cookie> cookies = driver.manage().getCookies();
+        List<CookieDto> cookieList = new ArrayList<>(cookies.size());
+        for (Cookie cookie : cookies) {
+            CookieDto cookieDto = new CookieDto();
+            cookieDto.setName(cookie.getName());
+            cookieDto.setValue(cookie.getValue());
+            cookieDto.setDomain(cookie.getDomain());
+            cookieDto.setPath(cookie.getPath());
+            cookieDto.setExpiry(cookie.getExpiry());
+            cookieList.add(cookieDto);
+        }
+        return cookieList;
+    }
 
-	public Actions action(){
-		if(actionsObj == null){
-			this.actionsObj = new Actions(this.driver);
-		}
-		return this.actionsObj;
-	}
+    @Override
+    public Map<String, String> getHeaders() {
+        return null;
+    }
 
-	public void clearAction(){
-		this.actionsObj = null;
-	}
+    @Override
+    public String getContentType() {
+        return null;
+    }
+
+    @Override
+    public String getUrl() {
+        return driver.getCurrentUrl();
+    }
+
+    public WebDriver getDriver() {
+        return driver;
+    }
+
+    public SeleniumResponse switchTo(int index) {
+        driver.switchTo().frame(index);
+        return this;
+    }
+
+    public SeleniumResponse switchTo(String name) {
+        driver.switchTo().frame(name);
+        return this;
+    }
+
+    public SeleniumResponse switchTo(WebElement element) {
+        driver.switchTo().frame(element);
+        return this;
+    }
+
+    public SeleniumResponse switchToDefault() {
+        driver.switchTo().defaultContent();
+        return this;
+    }
+
+    public void quit() {
+        try {
+            driver.quit();
+        } catch (Exception ignored) {
+            log.error("关闭浏览器出错，异常信息：{}", ignored);
+        }
+    }
+
+    public Actions action() {
+        if (actionsObj == null) {
+            this.actionsObj = new Actions(this.driver);
+        }
+        return this.actionsObj;
+    }
+
+    public void clearAction() {
+        this.actionsObj = null;
+    }
 }

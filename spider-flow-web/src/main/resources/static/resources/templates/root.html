@@ -31,6 +31,16 @@
 					<input type="number" min="1" name="threadCount" placeholder="请输入线程数" autocomplete="off" class="layui-input" value="{{=d.data.object.threadCount}}">
 				</div>
 			</div>
+			<div class="layui-col-md4">
+				<label class="layui-form-label" style="width:100px;">持久化 Cookie</label>
+				<div class="layui-input-block" style="margin-left:115px;">
+					<select name="persistentCookie">
+						<option value="none" {{d.data.object['persistentCookie'] == 'none' ? 'selected':''}}>无</option>
+						<option value="current" {{d.data.object['persistentCookie'] == 'current' ? 'selected':''}}>当前任务</option>
+						<option value="global"  {{d.data.object['persistentCookie'] == 'global'  ? 'selected':''}}>全局</option>
+					</select>
+				</div>
+			</div>
     	</form>
     </div>
     <div class="layui-tab-item">

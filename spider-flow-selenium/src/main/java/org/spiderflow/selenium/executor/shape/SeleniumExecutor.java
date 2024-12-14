@@ -1,6 +1,5 @@
 package org.spiderflow.selenium.executor.shape;
 
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -20,11 +19,12 @@ import org.spiderflow.selenium.utils.SeleniumResponseHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
@@ -79,7 +79,7 @@ public class SeleniumExecutor implements ShapeExecutor {
     }
 
     @Override
-    public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+    public Object execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
         String proxy = node.getStringJsonValue(PROXY);
         String driverType = node.getStringJsonValue(DRIVER_TYPE);
         String nodeVariableName = node.getStringJsonValue(NODE_VARIABLE_NAME);
@@ -88,14 +88,14 @@ public class SeleniumExecutor implements ShapeExecutor {
         }
         if (StringUtils.isBlank(driverType) || !providerMap.containsKey(driverType)) {
             logger.error("找不到驱动：{}", driverType);
-            return;
+            return null;
         }
         if (StringUtils.isNotBlank(proxy)) {
             try {
                 proxy = engine.execute(proxy, variables).toString();
                 logger.info("设置代理：{}", proxy);
             } catch (Exception e) {
-                logger.error("设置代理出错，异常信息：{}", e);
+                logger.error("设置代理出错 {} 异常信息：{}", proxy, e);
             }
         }
         Object oldResp = variables.get(nodeVariableName);
@@ -104,13 +104,14 @@ public class SeleniumExecutor implements ShapeExecutor {
             SeleniumResponse oldResponse = (SeleniumResponse) oldResp;
             oldResponse.quit();
         }
+        SeleniumResponse response = null;
         WebDriver driver = null;
         try {
             String url = engine.execute(node.getStringJsonValue(URL), variables).toString();
             logger.info("设置请求url:{}", url);
             driver = providerMap.get(driverType).getWebDriver(node, proxy);
-            driver.manage().timeouts().pageLoadTimeout(NumberUtils.toInt(node.getStringJsonValue(PAGE_LOAD_TIMEOUT), 60 * 1000), TimeUnit.MILLISECONDS);
-            driver.manage().timeouts().implicitlyWait(NumberUtils.toInt(node.getStringJsonValue(IMPLICITLY_WAIT_TIMEOUT), 3 * 1000), TimeUnit.MILLISECONDS);
+            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(NumberUtils.toInt(node.getStringJsonValue(PAGE_LOAD_TIMEOUT), 60 )));
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(NumberUtils.toInt(node.getStringJsonValue(IMPLICITLY_WAIT_TIMEOUT), 3)));
             //设置自动管理的Cookie
             boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
             CookieContext cookieContext = context.getCookieContext();
@@ -130,7 +131,7 @@ public class SeleniumExecutor implements ShapeExecutor {
             }
             //访问跳转url网站
             driver.get(url);
-            SeleniumResponse response = new SeleniumResponse(driver);
+            response = new SeleniumResponse(driver);
             SeleniumResponseHolder.add(context, response);
             if(cookieAutoSet){
                 Map<String, String> cookies = response.getCookies();
@@ -143,10 +144,12 @@ public class SeleniumExecutor implements ShapeExecutor {
                 try {
                     driver.quit();
                 } catch (Exception ignored) {
+                    logger.error("关闭浏览器出错，异常信息：{}", ignored);
                 }
             }
             ExceptionUtils.wrapAndThrow(e);
         }
+        return response;
     }
 
 }

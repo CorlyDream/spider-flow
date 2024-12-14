@@ -65,7 +65,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 	private Map<String, CSVPrinter> cachePrinter = new HashMap<>();
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+	public Object execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		SpiderOutput output = new SpiderOutput();
 		output.setNodeName(node.getNodeName());
 		output.setNodeId(node.getNodeId());
@@ -117,6 +117,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			outputHttp(url, outputData);
 		}
 		context.addOutput(output);
+		return output;
 	}
 
 	/**

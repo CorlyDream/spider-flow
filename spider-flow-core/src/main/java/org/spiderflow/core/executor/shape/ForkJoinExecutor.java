@@ -19,10 +19,7 @@ public class ForkJoinExecutor implements ShapeExecutor {
 	 * 缓存已完成节点的变量
 	 */
 	private Map<String, Map<String, Object>> cachedVariables = new HashMap<>();
-	
-	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-	}
+
 
 	@Override
 	public String supportShape() {

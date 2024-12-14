@@ -33,8 +33,11 @@ public interface ShapeExecutor {
 	 * @param node 当前要执行的爬虫节点
 	 * @param context 爬虫上下文
 	 * @param variables 节点流程的全部变量的集合
+	 * @return 返回当前节点的执行结果。比如： http 执行器，返回 response 对象
 	 */
-	void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables);
+	default Object execute(SpiderNode node, SpiderContext context, Map<String, Object> variables){
+		return null;
+	}
 	
 	default boolean allowExecuteNext(SpiderNode node, SpiderContext context, Map<String, Object> variables){
 		return true;

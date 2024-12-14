@@ -1,8 +1,5 @@
 package org.spiderflow.ocr.executor.shape;
 
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,6 +15,8 @@ import org.spiderflow.ocr.service.OcrService;
 import org.spiderflow.ocr.utils.OcrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class OcrOperationExecutor implements ShapeExecutor{
@@ -52,37 +51,37 @@ public class OcrOperationExecutor implements ShapeExecutor{
 	}
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	public Object execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+		String identifyResult = "";
 		try {
-			int ocrId = NumberUtils.toInt(node.getStringJsonValue(OCR_ID,"0"),0);
-			if(ocrId == 0){
+			int ocrId = NumberUtils.toInt(node.getStringJsonValue(OCR_ID, "0"), 0);
+			if (ocrId == 0) {
 				logger.debug("请选择OCR！");
-			}else {
+			} else {
 				Ocr ocr = ocrService.get(ocrId + "");
 				String bytesOrUrl = node.getStringJsonValue(BYTES_OR_URL);
 				JSONObject jsonResult = null;
-				if(bytesOrUrl.startsWith("http")) {
+				if (bytesOrUrl.startsWith("http")) {
 					jsonResult = OcrUtil.ocrIdentify(ocr, bytesOrUrl);
-				}else {
+				} else {
 					byte[] bytes = (byte[]) engine.execute(bytesOrUrl, variables);
 					jsonResult = OcrUtil.ocrIdentify(ocr, bytes);
 				}
-				if(jsonResult != null) {
-					if(jsonResult.isNull("words_result")) {
+				if (jsonResult != null) {
+					if (jsonResult.isNull("words_result")) {
 						logger.error(jsonResult.toString());
-					}else {
+					} else {
 						JSONArray wordsResult = jsonResult.getJSONArray("words_result");
-						if(wordsResult != null) {
+						if (wordsResult != null) {
 							double average = 0;
-							String identifyResult = "";
 							for (int i = 0; i < wordsResult.length(); i++) {
 								JSONObject probability = wordsResult.getJSONObject(i).getJSONObject("probability");
-								if(probability.getDouble("average") > average) {
+								if (probability.getDouble("average") > average) {
 									average = probability.getDouble("average");
 									identifyResult = wordsResult.getJSONObject(i).getString("words");
 								}
 							}
-							variables.put(node.getStringJsonValue(VARIABLE_NAME),identifyResult);
+							variables.put(node.getStringJsonValue(VARIABLE_NAME), identifyResult);
 						}
 					}
 				}
@@ -90,6 +89,7 @@ public class OcrOperationExecutor implements ShapeExecutor{
 		} catch (Exception e) {
 			logger.error("ocr操作错误：{}", e);
 		}
+		return identifyResult;
 	}
 	
 }

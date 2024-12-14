@@ -27,7 +27,7 @@ public class VariableExecutor implements ShapeExecutor{
 	private static final Logger logger = LoggerFactory.getLogger(VariableExecutor.class);
 	
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+	public Object execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		List<Map<String, String>> variableList = node.getListJsonValue(VARIABLE_NAME,VARIABLE_VALUE);
 		for (Map<String, String> nameValue : variableList) {
 			Object value = null;
@@ -43,6 +43,8 @@ public class VariableExecutor implements ShapeExecutor{
 			}
 			variables.put(variableName, value);
 		}
+		// 暂时用不上，先返回空
+		return null;
 	}
 
 	@Override

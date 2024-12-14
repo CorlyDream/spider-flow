@@ -1,5 +1,6 @@
 package org.spiderflow.core.executor.shape;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,20 +27,23 @@ public class FunctionExecutor implements ShapeExecutor{
 	private static final Logger logger = LoggerFactory.getLogger(FunctionExecutor.class);
 	
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+	public Object execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		List<Map<String, String>> functions = node.getListJsonValue(FUNCTION);
+		List<Object> exeResult = new ArrayList<>(functions.size());
 		for (Map<String, String> item : functions) {
 			String function = item.get(FUNCTION);
 			if(StringUtils.isNotBlank(function)){
 				try {
 					logger.debug("执行函数{}",function);
-					ExpressionUtils.execute(function, variables);
+					Object res = ExpressionUtils.execute(function, variables);
+					exeResult.add(res);
 				} catch (Exception e) {
 					logger.error("执行函数{}失败,异常信息:{}",function,e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			}
 		}
+		return exeResult;
 	}
 
 	@Override
