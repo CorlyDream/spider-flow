@@ -11,12 +11,7 @@ import org.spiderflow.model.SpiderNode;
  *
  */
 public interface ShapeExecutor {
-	
-	String LOOP_VARIABLE_NAME = "loopVariableName";
-	
-	String LOOP_COUNT = "loopCount";
-	
-	String THREAD_COUNT = "threadCount";
+
 
 	default Shape shape(){
 		return null;

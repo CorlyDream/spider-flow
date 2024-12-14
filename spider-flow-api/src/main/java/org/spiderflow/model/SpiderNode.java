@@ -11,195 +11,209 @@ import com.alibaba.fastjson.JSONArray;
 
 /**
  * 爬虫节点
- * @author jmxd
  *
+ * @author jmxd
  */
+
 public class SpiderNode {
-	/**
-	 * 节点的Json属性
-	 */
-	private Map<String,Object> jsonProperty = new HashMap<>();
-	/**
-	 * 节点列表中的下一个节点
-	 */
-	private List<SpiderNode> nextNodes = new ArrayList<>();
 
-	/**
-	 * 节点列表中的上一个节点
-	 */
-	private List<SpiderNode> prevNodes = new ArrayList<>();
+    public static final String LOOP_VARIABLE_NAME = "loopVariableName";
 
-	/**
-	 * 父级节点ID
-	 */
-	private Set<String> parentNodes;
+    public static final String LOOP_COUNT = "loopCount";
 
-	/**
-	 * 节点流转条件
-	 */
-	private Map<String,String> condition = new HashMap<>();
+    public static final String THREAD_COUNT = "threadCount";
 
-	/**
-	 * 异常流转
-	 */
-	private Map<String,String> exception = new HashMap<>();
+    public static final String SUBMIT_STRATEGE = "submit-strategy";
 
-	/**
-	 * 传递变量
-	 */
-	private Map<String,String> transmitVariable = new HashMap<>();
-	/**
-	 * 节点名称
-	 */
-	private String nodeName;
-	/**
-	 * 节点ID
-	 */
-	private String nodeId;
+    public static final String PERSISTENT_COOKIE = "persistentCookie";
 
-	/**
-	 * 计数器,用来计算当前节点执行中的个数
-	 */
-	private AtomicInteger counter = new AtomicInteger();
+    /**
+     * 节点的Json属性
+     */
+    private Map<String, Object> jsonProperty = new HashMap<>();
+    /**
+     * 节点列表中的下一个节点
+     */
+    private List<SpiderNode> nextNodes = new ArrayList<>();
 
-	public String getNodeId() {
-		return nodeId;
-	}
+    /**
+     * 节点列表中的上一个节点
+     */
+    private List<SpiderNode> prevNodes = new ArrayList<>();
 
-	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
-	}
+    /**
+     * 父级节点ID
+     */
+    private Set<String> parentNodes;
 
-	public String getNodeName() {
-		return nodeName;
-	}
+    /**
+     * 节点流转条件
+     */
+    private Map<String, String> condition = new HashMap<>();
 
-	public void setNodeName(String nodeName) {
-		this.nodeName = nodeName;
-	}
+    /**
+     * 异常流转
+     */
+    private Map<String, String> exception = new HashMap<>();
 
-	public String getStringJsonValue(String key){
-		String value = (String) this.jsonProperty.get(key);
-		if(value != null){
-			value = StringEscapeUtils.unescapeHtml4(value);
-		}
-		return value;
-	}
+    /**
+     * 传递变量
+     */
+    private Map<String, String> transmitVariable = new HashMap<>();
+    /**
+     * 节点名称
+     */
+    private String nodeName;
+    /**
+     * 节点ID
+     */
+    private String nodeId;
 
-	public String getStringJsonValue(String key,String defaultValue){
-		String value = getStringJsonValue(key);
-		return StringUtils.isNotBlank(value) ? value : defaultValue;
-	}
-	
-	public List<Map<String,String>> getListJsonValue(String ... keys){
-		List<JSONArray> arrays = new ArrayList<>();
-		int size = -1;
-		List<Map<String,String>> result = new ArrayList<>();
-		for (int i = 0; i < keys.length; i++) {
-			JSONArray jsonArray = (JSONArray) this.jsonProperty.get(keys[i]);
-			if(jsonArray != null){
-				if(size == -1){
-					size = jsonArray.size();
-				}else if(size != jsonArray.size()){
-					throw new ArrayIndexOutOfBoundsException();
-				}
-				arrays.add(jsonArray);
-			}
-		}
-		for (int i = 0;i < size;i++) {
-			Map<String,String> item = new HashMap<>();
-			for (int j = 0; j < keys.length; j++) {
-				String val = arrays.get(j).getString(i);
-				if(val != null){
-					val = StringEscapeUtils.unescapeHtml4(val);
-				}
-				item.put(keys[j],val);
-			}
-			result.add(item);
-		}
-		return result;
-	}
-	public void setJsonProperty(Map<String, Object> jsonProperty) {
-		this.jsonProperty = jsonProperty;
-	}
+    /**
+     * 计数器,用来计算当前节点执行中的个数
+     */
+    private AtomicInteger counter = new AtomicInteger();
 
-	public void addNextNode(SpiderNode nextNode){
-		nextNode.prevNodes.add(this);
-		this.nextNodes.add(nextNode);
-	}
+    public String getNodeId() {
+        return nodeId;
+    }
 
-	public String getExceptionFlow(String fromNodeId) {
-		return exception.get(fromNodeId);
-	}
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
+    }
 
-	public boolean isTransmitVariable(String fromNodeId) {
-		String value = transmitVariable.get(fromNodeId);
-		return value == null || "1".equalsIgnoreCase(value);
-	}
+    public String getNodeName() {
+        return nodeName;
+    }
 
-	public void setTransmitVariable(String fromNodeId,String value){
-		this.transmitVariable.put(fromNodeId,value);
-	}
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
 
-	public void setExceptionFlow(String fromNodeId,String value){
-		this.exception.put(fromNodeId,value);
-	}
+    public String getStringJsonValue(String key) {
+        String value = (String) this.jsonProperty.get(key);
+        if (value != null) {
+            value = StringEscapeUtils.unescapeHtml4(value);
+        }
+        return value;
+    }
 
-	public List<SpiderNode> getNextNodes() {
-		return nextNodes;
-	}
+    public String getStringJsonValue(String key, String defaultValue) {
+        String value = getStringJsonValue(key);
+        return StringUtils.isNotBlank(value) ? value : defaultValue;
+    }
 
-	public String getCondition(String fromNodeId) {
-		return condition.get(fromNodeId);
-	}
+    public List<Map<String, String>> getListJsonValue(String... keys) {
+        List<JSONArray> arrays = new ArrayList<>();
+        int size = -1;
+        List<Map<String, String>> result = new ArrayList<>();
+        for (int i = 0; i < keys.length; i++) {
+            JSONArray jsonArray = (JSONArray) this.jsonProperty.get(keys[i]);
+            if (jsonArray != null) {
+                if (size == -1) {
+                    size = jsonArray.size();
+                } else if (size != jsonArray.size()) {
+                    throw new ArrayIndexOutOfBoundsException();
+                }
+                arrays.add(jsonArray);
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            Map<String, String> item = new HashMap<>();
+            for (int j = 0; j < keys.length; j++) {
+                String val = arrays.get(j).getString(i);
+                if (val != null) {
+                    val = StringEscapeUtils.unescapeHtml4(val);
+                }
+                item.put(keys[j], val);
+            }
+            result.add(item);
+        }
+        return result;
+    }
 
-	public void setCondition(String fromNodeId,String condition) {
-		this.condition.put(fromNodeId, condition);
-	}
+    public void setJsonProperty(Map<String, Object> jsonProperty) {
+        this.jsonProperty = jsonProperty;
+    }
 
-	public void increment(){
-		counter.incrementAndGet();
-	}
+    public void addNextNode(SpiderNode nextNode) {
+        nextNode.prevNodes.add(this);
+        this.nextNodes.add(nextNode);
+    }
 
-	public void decrement(){
-		counter.decrementAndGet();
-	}
+    public String getExceptionFlow(String fromNodeId) {
+        return exception.get(fromNodeId);
+    }
 
-	public boolean hasLeftNode(String nodeId){
-		if(parentNodes == null){
-			Set<String> parents = new HashSet<>();
-			generateParents(parents);
-			this.parentNodes = parents;
-		}
-		return this.parentNodes.contains(nodeId);
-	}
+    public boolean isTransmitVariable(String fromNodeId) {
+        String value = transmitVariable.get(fromNodeId);
+        return value == null || "1".equalsIgnoreCase(value);
+    }
 
-	private void generateParents(Set<String> parents){
-		for (SpiderNode prevNode : prevNodes) {
-			if(parents.add(prevNode.nodeId)){
-				prevNode.generateParents(parents);
-			}
-		}
-	}
+    public void setTransmitVariable(String fromNodeId, String value) {
+        this.transmitVariable.put(fromNodeId, value);
+    }
 
-	public boolean isDone(){
-		return isDone(new HashSet<>());
-	}
-	public boolean isDone(Set<String> visited){
-		if(this.counter.get() == 0){
-			for (SpiderNode prevNode : prevNodes) {
-				if(visited.add(nodeId)&&!prevNode.isDone(visited)){
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
+    public void setExceptionFlow(String fromNodeId, String value) {
+        this.exception.put(fromNodeId, value);
+    }
 
-	@Override
-	public String toString() {
-		return "SpiderNode [jsonProperty=" + jsonProperty + ", nextNodes=" + nextNodes + ", condition=" + condition
-				+ ", nodeName=" + nodeName + ", nodeId=" + nodeId + "]";
-	}
+    public List<SpiderNode> getNextNodes() {
+        return nextNodes;
+    }
+
+    public String getCondition(String fromNodeId) {
+        return condition.get(fromNodeId);
+    }
+
+    public void setCondition(String fromNodeId, String condition) {
+        this.condition.put(fromNodeId, condition);
+    }
+
+    public void increment() {
+        counter.incrementAndGet();
+    }
+
+    public void decrement() {
+        counter.decrementAndGet();
+    }
+
+    public boolean hasLeftNode(String nodeId) {
+        if (parentNodes == null) {
+            Set<String> parents = new HashSet<>();
+            generateParents(parents);
+            this.parentNodes = parents;
+        }
+        return this.parentNodes.contains(nodeId);
+    }
+
+    private void generateParents(Set<String> parents) {
+        for (SpiderNode prevNode : prevNodes) {
+            if (parents.add(prevNode.nodeId)) {
+                prevNode.generateParents(parents);
+            }
+        }
+    }
+
+    public boolean isDone() {
+        return isDone(new HashSet<>());
+    }
+
+    public boolean isDone(Set<String> visited) {
+        if (this.counter.get() == 0) {
+            for (SpiderNode prevNode : prevNodes) {
+                if (visited.add(nodeId) && !prevNode.isDone(visited)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "SpiderNode [jsonProperty=" + jsonProperty + ", nextNodes=" + nextNodes + ", condition=" + condition
+                + ", nodeName=" + nodeName + ", nodeId=" + nodeId + "]";
+    }
 }

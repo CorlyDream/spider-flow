@@ -10,19 +10,25 @@ import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecu
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.executor.shape.LoopExecutor;
+import org.spiderflow.core.model.FlowCookies;
 import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.service.FlowCookiesService;
 import org.spiderflow.core.service.FlowNoticeService;
 import org.spiderflow.core.utils.ExecutorsUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.enums.FlowNoticeType;
+import org.spiderflow.enums.PersistentCookieEnum;
 import org.spiderflow.executor.ShapeExecutor;
+import org.spiderflow.io.SpiderResponse;
 import org.spiderflow.listener.SpiderListener;
+import org.spiderflow.model.CookieDto;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Array;
@@ -55,6 +61,8 @@ public class Spider {
 	
 	@Autowired
 	private FlowNoticeService flowNoticeService;
+	@Autowired
+	private FlowCookiesService flowCookiesService;
 
 	public static SpiderFlowThreadPoolExecutor executorInstance;
 
@@ -108,8 +116,8 @@ public class Spider {
 	 */
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
 		//获取当前流程执行线程数
-		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
-		String strategy = root.getStringJsonValue("submit-strategy");
+		int nThreads = NumberUtils.toInt(root.getStringJsonValue(SpiderNode.THREAD_COUNT), defaultThreads);
+		String strategy = root.getStringJsonValue(SpiderNode.SUBMIT_STRATEGE);
 		ThreadSubmitStrategy submitStrategy;
 		//选择提交策略，这里一定要使用new,不能与其他实例共享
 		if("linked".equalsIgnoreCase(strategy)){
@@ -129,6 +137,8 @@ public class Spider {
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
+		// 处理持久化 cookie
+		fillPersistentCookies(context);
 		Comparator<SpiderNode> comparator = submitStrategy.comparator();
 		//启动一个线程开始执行任务,并监听其结束并执行下一级
 		Future<?> f = pool.submitAsync(TtlRunnable.get(() -> {
@@ -218,7 +228,7 @@ public class Spider {
 		int loopCount = 1;	//循环次数默认为1,如果节点有循环属性且填了循环次数/集合,则取出循环次数
 		int loopStart = 0;	//循环起始位置
 		int loopEnd = 1;	//循环结束位置
-		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
+		String loopCountStr = node.getStringJsonValue(SpiderNode.LOOP_COUNT);
 		Object loopArray = null;
 		boolean isLoop = false;
 		if (isLoop = StringUtils.isNotBlank(loopCountStr)) {
@@ -253,7 +263,7 @@ public class Spider {
 		}
 		if (loopCount > 0) {
 			//获取循环下标的变量名称
-			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
+			String loopVariableName = node.getStringJsonValue(SpiderNode.LOOP_VARIABLE_NAME);
 			String loopItem = node.getStringJsonValue(LoopExecutor.LOOP_ITEM,"item");
 			List<SpiderTask> tasks = new ArrayList<>();
 			for (int i = loopStart; i < loopEnd; i++) {
@@ -282,7 +292,10 @@ public class Spider {
 									return;
 								}
 								//执行节点具体逻辑
-								executor.execute(node, context, nVariables);
+								Object result = executor.execute(node, context, nVariables);
+								if (result instanceof SpiderResponse) {
+									processCookie((SpiderResponse) result, context);
+								}
 								//当未发生异常时，移除ex变量
 								nVariables.remove("ex");
 							} catch (Throwable t) {
@@ -336,6 +349,47 @@ public class Spider {
 			}
 		}
 		return true;
+	}
+
+	private void processCookie(SpiderResponse response, SpiderContext context) {
+		String value = context.getRootNode().getStringJsonValue(SpiderNode.PERSISTENT_COOKIE);
+		if (PersistentCookieEnum.NONE.name().equalsIgnoreCase(value)) {
+			return;
+		}
+		List<CookieDto> cookieList = response.getCookieList();
+		if (CollectionUtils.isEmpty(cookieList)) {
+			return;
+		}
+		String flowId = null;
+		if (PersistentCookieEnum.CURRENT.name().equalsIgnoreCase(value)) {
+			flowId = context.getFlowId();
+			// 页面测试的时候，没有 flowId
+			if (StringUtils.isBlank(flowId)) {
+				flowId = "test";
+			}
+		}
+		flowCookiesService.saveCookies(cookieList, flowId);
+	}
+
+	/**
+	 * 处理持久化 cookie
+	 * @param context
+	 */
+	private void fillPersistentCookies(SpiderContext context){
+		String value = context.getRootNode().getStringJsonValue(SpiderNode.PERSISTENT_COOKIE);
+		if (PersistentCookieEnum.NONE.name().equalsIgnoreCase(value)) {
+			return;
+		}
+		String flowId = null;
+		if (PersistentCookieEnum.CURRENT.name().equalsIgnoreCase(value)) {
+			flowId = context.getFlowId();
+		}
+		// 页面测试的时候，没有 flowId
+		if (StringUtils.isBlank(flowId)) {
+			flowId = "test";
+		}
+		List<FlowCookies> cookieList = flowCookiesService.getAllCookies(flowId);
+
 	}
 
 	class SpiderTask{
