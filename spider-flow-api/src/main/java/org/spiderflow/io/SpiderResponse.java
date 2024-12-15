@@ -29,6 +29,8 @@ public interface SpiderResponse {
 	default Object getJson(){
 		return JSON.parse(getHtml());
 	}
+
+	@Deprecated // Use getCookieList instead
 	@Comment("获取cookies")
 	@Example("${resp.cookies}")
 	Map<String,String> getCookies();

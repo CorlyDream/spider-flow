@@ -60,7 +60,12 @@ public class SeleniumResponse implements SpiderResponse {
             CookieDto cookieDto = new CookieDto();
             cookieDto.setName(cookie.getName());
             cookieDto.setValue(cookie.getValue());
-            cookieDto.setDomain(cookie.getDomain());
+            if (cookie.getDomain().startsWith(".")) {
+                cookieDto.setDomain(cookie.getDomain());
+            } else {
+                // 浏览器会自动在 domain 前面加上 . ，这里手动加上
+                cookieDto.setDomain("." + cookie.getDomain());
+            }
             cookieDto.setPath(cookie.getPath());
             cookieDto.setExpiry(cookie.getExpiry());
             cookieList.add(cookieDto);

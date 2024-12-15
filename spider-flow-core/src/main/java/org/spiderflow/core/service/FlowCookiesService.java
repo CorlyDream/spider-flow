@@ -2,7 +2,6 @@ package org.spiderflow.core.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import org.apache.commons.lang3.time.DateUtils;
 import org.spiderflow.core.mapper.FlowCookiesMapper;
 import org.spiderflow.core.model.FlowCookies;
 import org.spiderflow.model.CookieDto;
@@ -20,6 +19,10 @@ public class FlowCookiesService {
     public int saveCookies(List<CookieDto> cookieDtos, String flowId) {
         int count = 0;
         for (CookieDto cookieDto : cookieDtos) {
+            if (cookieDto.getExpiry() == null) {
+                // session cookie not save
+                continue;
+            }
             FlowCookies flowCookie = new FlowCookies();
             flowCookie.setFlowId(flowId);
             flowCookie.setDomain(cookieDto.getDomain());
@@ -27,10 +30,6 @@ public class FlowCookiesService {
             flowCookie.setValue(cookieDto.getValue());
             flowCookie.setPath(cookieDto.getPath());
             flowCookie.setExpiry(cookieDto.getExpiry());
-            if (cookieDto.getExpiry() == null) {
-                Date date = DateUtils.addYears(new Date(), 1);
-                flowCookie.setExpiry(date);
-            }
             count += saveOrUpdate(flowCookie);
         }
         return count;

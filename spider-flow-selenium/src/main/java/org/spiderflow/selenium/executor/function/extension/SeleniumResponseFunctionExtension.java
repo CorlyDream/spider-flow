@@ -10,12 +10,12 @@ import org.spiderflow.context.CookieContext;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.executor.FunctionExtension;
+import org.spiderflow.model.CookieDto;
 import org.spiderflow.selenium.io.SeleniumResponse;
 import org.spiderflow.selenium.model.WebElements;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class SeleniumResponseFunctionExtension implements FunctionExtension {
@@ -95,10 +95,8 @@ public class SeleniumResponseFunctionExtension implements FunctionExtension {
     public static SeleniumResponse loadCookies(SeleniumResponse response) {
         SpiderContext spiderContext = SpiderContextHolder.get();
         CookieContext cookieContext = spiderContext.getCookieContext();
-        Map<String, String> cookies = response.getCookies();
-        if (cookies != null && !cookies.isEmpty()) {
-            cookieContext.putAll(cookies);
-        }
+        List<CookieDto> cookieList = response.getCookieList();
+        cookieList.forEach(cookieContext::addCookie);
         return response;
     }
 }

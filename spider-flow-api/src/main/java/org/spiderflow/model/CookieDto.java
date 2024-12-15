@@ -1,6 +1,7 @@
 package org.spiderflow.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class CookieDto {
     /**
@@ -66,5 +67,22 @@ public class CookieDto {
 
     public void setExpiry(Date expiry) {
         this.expiry = expiry;
+    }
+
+    @Override
+    public String toString() {
+        return "{\"name\":\"" + name + "\",\"value\":\"" + value + "\",\"domain\":\"" + domain + "\",\"path\":\"" + path + "\"}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        CookieDto cookieDto = (CookieDto) o;
+        return Objects.equals(name, cookieDto.name) && Objects.equals(domain, cookieDto.domain) && Objects.equals(path, cookieDto.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, domain, path);
     }
 }

@@ -11,6 +11,7 @@ import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.CookieContext;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
+import org.spiderflow.model.CookieDto;
 import org.spiderflow.model.Shape;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.selenium.driver.DriverProvider;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -121,10 +122,9 @@ public class SeleniumExecutor implements ShapeExecutor {
             if(cookieAutoSet){
                 driver.manage().deleteAllCookies();
                 URL tempUrl = new URL(url);
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.MONTH, 1);
-                for (Map.Entry<String, String> item : cookieContext.entrySet()) {
-                    Cookie cookie = new Cookie(item.getKey(), item.getValue(), tempUrl.getHost(), "/", calendar.getTime() , false, false);
+                Collection<CookieDto> setCookies = cookieContext.getUrlCookies(tempUrl);
+                for (CookieDto item : setCookies) {
+                    Cookie cookie = new Cookie(item.getName(), item.getValue(), item.getDomain(), item.getPath(), item.getExpiry() , false, false);
                     driver.manage().addCookie(cookie);
                 }
                 logger.debug("自动设置Cookie：{}", cookieContext);
@@ -134,8 +134,10 @@ public class SeleniumExecutor implements ShapeExecutor {
             response = new SeleniumResponse(driver);
             SeleniumResponseHolder.add(context, response);
             if(cookieAutoSet){
-                Map<String, String> cookies = response.getCookies();
-                cookieContext.putAll(cookies);
+                List<CookieDto> cookieList = response.getCookieList();
+                for (CookieDto cookieDto : cookieList) {
+                    cookieContext.addCookie(cookieDto);
+                }
             }
             variables.put(nodeVariableName, response);
         } catch (Exception e) {

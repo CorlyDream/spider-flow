@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.concurrent.*;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
+import org.spiderflow.context.CookieContext;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.executor.shape.LoopExecutor;
@@ -25,6 +26,7 @@ import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.CookieDto;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -389,7 +391,15 @@ public class Spider {
 			flowId = "test";
 		}
 		List<FlowCookies> cookieList = flowCookiesService.getAllCookies(flowId);
-
+		if (CollectionUtils.isEmpty(cookieList)) {
+			return;
+		}
+		CookieContext cookieContext = context.getCookieContext();
+		for (FlowCookies cookie : cookieList) {
+			CookieDto cookieDto = new CookieDto();
+			BeanUtils.copyProperties(cookie, cookieDto);
+			cookieContext.addCookie(cookieDto);
+		}
 	}
 
 	class SpiderTask{
