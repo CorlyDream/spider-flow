@@ -2,12 +2,22 @@ package org.spiderflow.core.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.CookieStore;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
+import org.htmlunit.jetty.util.HttpCookieStore;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * 请求对象包装类
@@ -115,14 +125,42 @@ public class HttpRequest {
 		this.connection.proxy(host, port);
 		return this;
 	}
-	
+	public HttpRequest validateTLSCertificates(boolean value){
+		if (!value) {
+			this.connection.sslSocketFactory(socketFactory());
+		}
+		return this;
+	}
 
 	public HttpResponse execute() throws IOException{
 		this.connection.ignoreContentType(true);
 		this.connection.ignoreHttpErrors(true);
 		this.connection.maxBodySize(0);
-
+		CookieStore cookieStore = new HttpCookieStore();
+		this.connection.cookieStore(cookieStore);
 		Response response = connection.execute();
-		return new HttpResponse(response);
+		return new HttpResponse(response, cookieStore);
+	}
+
+	static private SSLSocketFactory socketFactory() {
+		TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				return new X509Certificate[0];
+			}
+
+			public void checkClientTrusted(X509Certificate[] certs, String authType) {
+			}
+
+			public void checkServerTrusted(X509Certificate[] certs, String authType) {
+			}
+		}};
+
+		try {
+			SSLContext sslContext = SSLContext.getInstance("SSL");
+			sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+			return sslContext.getSocketFactory();
+		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+			throw new RuntimeException("Failed to create a SSL socket factory", e);
+		}
 	}
 }

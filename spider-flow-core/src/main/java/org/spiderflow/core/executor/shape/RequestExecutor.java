@@ -24,6 +24,7 @@ import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -189,7 +190,7 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
 
             //是否验证TLS证书,默认是验证
             if ("0".equals(node.getStringJsonValue(TLS_VALIDATE))) {
-//				request.validateTLSCertificates(false);
+				request.validateTLSCertificates(false);
                 logger.debug("设置TLS证书验证：{}", false);
             }
             SpiderNode root = context.getRootNode();
@@ -276,10 +277,8 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
                         logger.debug("设置response charset:{}", charset);
                     }
                     //cookie存入cookieContext
-                    if (cookieDomain != null && response.getCookies() != null) {
-                        for (Map.Entry<String, String> cookie : response.getCookies().entrySet()) {
-                            cookieContext.addCookie(cookie.getKey(), cookie.getValue(), cookieDomain);
-                        }
+                    if (!response.getCookieList().isEmpty()) {
+                        cookieContext.addCookies(response.getCookieList());
                     }
                     //结果存入变量
                     variables.put("resp", response);
@@ -319,7 +318,7 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
                             } catch (IOException ignored) {
                             }
                         }
-                        logger.error("请求{}出错,异常信息:{}", url, exception);
+                        logger.error("请求{}出错", url, exception);
                     }
                 }
             }

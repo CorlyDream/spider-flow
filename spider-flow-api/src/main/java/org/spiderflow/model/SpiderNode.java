@@ -27,6 +27,8 @@ public class SpiderNode {
 
     public static final String PERSISTENT_COOKIE = "persistentCookie";
 
+    public static final String SPIDER_NAME = "spiderName";
+
     /**
      * 节点的Json属性
      */

@@ -117,6 +117,10 @@ public class Spider {
 	 * 执行根节点
 	 */
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
+		String spiderName = root.getStringJsonValue(SpiderNode.SPIDER_NAME);
+		if (StringUtils.isNotBlank(spiderName)) {
+			variables.put(SpiderNode.SPIDER_NAME, spiderName);
+		}
 		//获取当前流程执行线程数
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(SpiderNode.THREAD_COUNT), defaultThreads);
 		String strategy = root.getStringJsonValue(SpiderNode.SUBMIT_STRATEGE);

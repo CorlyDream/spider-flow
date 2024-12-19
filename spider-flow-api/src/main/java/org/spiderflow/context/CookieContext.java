@@ -27,7 +27,11 @@ public class CookieContext {
     }
 
     public void addCookie(CookieDto cookie) {
-        cookies.add(cookie);
+        this.cookies.add(cookie);
+    }
+
+    public void addCookies(Collection<CookieDto> cookies) {
+        this.cookies.addAll(cookies);
     }
 
     /**

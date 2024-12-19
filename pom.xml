@@ -27,7 +27,6 @@
         <apache.commons.csv.verion>1.8</apache.commons.csv.verion>
         <commons.io.version>2.17.0</commons.io.version>
         <guava.version>33.3.1-jre</guava.version>
-        <!--		<jsoup.version>1.11.3</jsoup.version>-->
         <xsoup.version>0.3.7</xsoup.version>
         <selenium.version>4.26.0</selenium.version>
     </properties>
@@ -107,15 +106,15 @@
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
-        <!--		<dependency>-->
-        <!--			<groupId>org.jsoup</groupId>-->
-        <!--			<artifactId>jsoup</artifactId>-->
-        <!--			<version>${jsoup.version}</version>-->
-        <!--		</dependency>-->
         <dependency>
             <groupId>us.codecraft</groupId>
             <artifactId>xsoup</artifactId>
             <version>${xsoup.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.18.3</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
