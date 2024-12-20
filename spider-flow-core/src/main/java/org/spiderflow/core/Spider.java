@@ -26,6 +26,7 @@ import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.CookieDto;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
+import org.spiderflow.utils.Constants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -117,13 +118,13 @@ public class Spider {
 	 * 执行根节点
 	 */
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
-		String spiderName = root.getStringJsonValue(SpiderNode.SPIDER_NAME);
+		String spiderName = root.getStringJsonValue(Constants.SPIDER_NAME);
 		if (StringUtils.isNotBlank(spiderName)) {
-			variables.put(SpiderNode.SPIDER_NAME, spiderName);
+			variables.put(Constants.SPIDER_NAME, spiderName);
 		}
 		//获取当前流程执行线程数
-		int nThreads = NumberUtils.toInt(root.getStringJsonValue(SpiderNode.THREAD_COUNT), defaultThreads);
-		String strategy = root.getStringJsonValue(SpiderNode.SUBMIT_STRATEGE);
+		int nThreads = NumberUtils.toInt(root.getStringJsonValue(Constants.THREAD_COUNT), defaultThreads);
+		String strategy = root.getStringJsonValue(Constants.SUBMIT_STRATEGE);
 		ThreadSubmitStrategy submitStrategy;
 		//选择提交策略，这里一定要使用new,不能与其他实例共享
 		if("linked".equalsIgnoreCase(strategy)){
@@ -234,7 +235,7 @@ public class Spider {
 		int loopCount = 1;	//循环次数默认为1,如果节点有循环属性且填了循环次数/集合,则取出循环次数
 		int loopStart = 0;	//循环起始位置
 		int loopEnd = 1;	//循环结束位置
-		String loopCountStr = node.getStringJsonValue(SpiderNode.LOOP_COUNT);
+		String loopCountStr = node.getStringJsonValue(Constants.LOOP_COUNT);
 		Object loopArray = null;
 		boolean isLoop = false;
 		if (isLoop = StringUtils.isNotBlank(loopCountStr)) {
@@ -269,7 +270,7 @@ public class Spider {
 		}
 		if (loopCount > 0) {
 			//获取循环下标的变量名称
-			String loopVariableName = node.getStringJsonValue(SpiderNode.LOOP_VARIABLE_NAME);
+			String loopVariableName = node.getStringJsonValue(Constants.LOOP_VARIABLE_NAME);
 			String loopItem = node.getStringJsonValue(LoopExecutor.LOOP_ITEM,"item");
 			List<SpiderTask> tasks = new ArrayList<>();
 			for (int i = loopStart; i < loopEnd; i++) {
@@ -358,8 +359,8 @@ public class Spider {
 	}
 
 	private void processCookie(SpiderResponse response, SpiderContext context) {
-		String value = context.getRootNode().getStringJsonValue(SpiderNode.PERSISTENT_COOKIE);
-		if (PersistentCookieEnum.NONE.name().equalsIgnoreCase(value)) {
+		String value = context.getRootNode().getStringJsonValue(Constants.PERSISTENT_COOKIE);
+		if (StringUtils.isBlank(value) || PersistentCookieEnum.NONE.name().equalsIgnoreCase(value)) {
 			return;
 		}
 		List<CookieDto> cookieList = response.getCookieList();
@@ -382,7 +383,7 @@ public class Spider {
 	 * @param context
 	 */
 	private void fillPersistentCookies(SpiderContext context){
-		String value = context.getRootNode().getStringJsonValue(SpiderNode.PERSISTENT_COOKIE);
+		String value = context.getRootNode().getStringJsonValue(Constants.PERSISTENT_COOKIE);
 		if (PersistentCookieEnum.NONE.name().equalsIgnoreCase(value)) {
 			return;
 		}

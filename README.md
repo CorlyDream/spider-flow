@@ -28,8 +28,9 @@
 - [x] 支持插件扩展(自定义执行器，自定义方法）
 - [x] 任务监控,任务日志
 - [x] 支持HTTP接口
-- [x] 支持Cookie自动管理
+- [x] 支持Cookie自动管理，Cookie 持久化
 - [x] 支持自定义函数
+- [ ] 子任务 Cookie 处理
 
 ## 插件
 - [x] [Selenium插件](https://gitee.com/ssssssss-team/spider-flow-selenium)

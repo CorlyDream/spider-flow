@@ -24,7 +24,6 @@ import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -33,6 +32,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 
+import static org.spiderflow.utils.Constants.*;
+
 /**
  * 请求执行器
  *
@@ -40,60 +41,6 @@ import java.util.*;
  */
 @Component
 public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListener {
-
-    public static final String SLEEP = "sleep";
-
-    public static final String URL = "url";
-
-    public static final String PROXY = "proxy";
-
-    public static final String REQUEST_METHOD = "method";
-
-    public static final String PARAMETER_NAME = "parameter-name";
-
-    public static final String PARAMETER_VALUE = "parameter-value";
-
-    public static final String COOKIE_NAME = "cookie-name";
-
-    public static final String COOKIE_VALUE = "cookie-value";
-
-    public static final String PARAMETER_FORM_NAME = "parameter-form-name";
-
-    public static final String PARAMETER_FORM_VALUE = "parameter-form-value";
-
-    public static final String PARAMETER_FORM_FILENAME = "parameter-form-filename";
-
-    public static final String PARAMETER_FORM_TYPE = "parameter-form-type";
-
-    public static final String BODY_TYPE = "body-type";
-
-    public static final String BODY_CONTENT_TYPE = "body-content-type";
-
-    public static final String REQUEST_BODY = "request-body";
-
-    public static final String HEADER_NAME = "header-name";
-
-    public static final String HEADER_VALUE = "header-value";
-
-    public static final String TIMEOUT = "timeout";
-
-    public static final String RETRY_COUNT = "retryCount";
-
-    public static final String RETRY_INTERVAL = "retryInterval";
-
-    public static final String RESPONSE_CHARSET = "response-charset";
-
-    public static final String FOLLOW_REDIRECT = "follow-redirect";
-
-    public static final String TLS_VALIDATE = "tls-validate";
-
-    public static final String LAST_EXECUTE_TIME = "__last_execute_time_";
-
-    public static final String COOKIE_AUTO_SET = "cookie-auto-set";
-
-    public static final String REPEAT_ENABLE = "repeat-enable";
-
-    public static final String BLOOM_FILTER_KEY = "_bloomfilter";
 
     @Value("${spider.workspace}")
     private String workspcace;

@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static org.spiderflow.utils.Constants.*;
+
 /**
  * 爬虫上下文
  *
@@ -100,14 +102,12 @@ public class SpiderContext extends HashMap<String, Object> {
 
     public void setRootNode(SpiderNode rootNode) {
         this.rootNode = rootNode;
-        List<Map<String, String>> listJsonValue = rootNode.getListJsonValue("cookie-name", "cookie-value");
+        List<Map<String, String>> listJsonValue = rootNode.getListJsonValue(COOKIE_NAME, COOKIE_VALUE, COOKIE_DOMAIN );
         if (listJsonValue.isEmpty()) {
             return;
         }
         for (Map<String, String> map : listJsonValue) {
-
-
-            cookieContext.addCookie(map.get("cookie-name"), map.get("cookie-value"), map.get("cookie-domain"));
+            cookieContext.addCookie(map.get(COOKIE_NAME), map.get(COOKIE_VALUE), map.get(COOKIE_DOMAIN));
         }
     }
 

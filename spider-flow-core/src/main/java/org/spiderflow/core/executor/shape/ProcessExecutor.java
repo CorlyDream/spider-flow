@@ -11,6 +11,7 @@ import org.spiderflow.core.service.SpiderFlowService;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
+import org.spiderflow.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessExecutor implements ShapeExecutor{
 	
-	public static final String FLOW_ID = "flowId";
 
 	private static Logger logger = LoggerFactory.getLogger(ProcessExecutor.class);
 	
@@ -34,7 +34,7 @@ public class ProcessExecutor implements ShapeExecutor{
 	
 	@Override
 	public Object execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-		String flowId = node.getStringJsonValue("flowId");
+		String flowId = node.getStringJsonValue(Constants.FLOW_ID);
 		SpiderFlow spiderFlow = spiderFlowService.getById(flowId);
 		if(spiderFlow != null){
 			logger.info("执行子流程:{}", spiderFlow.getName());

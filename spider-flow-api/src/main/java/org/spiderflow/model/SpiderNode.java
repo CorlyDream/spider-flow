@@ -17,17 +17,7 @@ import com.alibaba.fastjson.JSONArray;
 
 public class SpiderNode {
 
-    public static final String LOOP_VARIABLE_NAME = "loopVariableName";
 
-    public static final String LOOP_COUNT = "loopCount";
-
-    public static final String THREAD_COUNT = "threadCount";
-
-    public static final String SUBMIT_STRATEGE = "submit-strategy";
-
-    public static final String PERSISTENT_COOKIE = "persistentCookie";
-
-    public static final String SPIDER_NAME = "spiderName";
 
     /**
      * 节点的Json属性

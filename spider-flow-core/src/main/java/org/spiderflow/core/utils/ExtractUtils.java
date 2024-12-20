@@ -169,10 +169,6 @@ public class ExtractUtils {
 		return Xsoup.select(elements.html(),xpath).get();
 	}
 	
-	public static String getElementByXPath(Element element,String xpath){
-		return Xsoup.select(element,xpath).get();
-	}
-	
 	public static boolean isNumber(String str) {
         return compile("^(\\-|\\+)?\\d+(\\.\\d+)?$").matcher(str).matches();  
 	}
