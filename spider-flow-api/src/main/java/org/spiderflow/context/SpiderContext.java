@@ -102,6 +102,14 @@ public class SpiderContext extends HashMap<String, Object> {
 
     public void setRootNode(SpiderNode rootNode) {
         this.rootNode = rootNode;
+        this.fillGlobalCookieList(rootNode);
+    }
+
+    /**
+     * 节点的全局 cookie配置
+     * @param node
+     */
+    public void fillGlobalCookieList(SpiderNode node) {
         List<Map<String, String>> listJsonValue = rootNode.getListJsonValue(COOKIE_NAME, COOKIE_VALUE, COOKIE_DOMAIN );
         if (listJsonValue.isEmpty()) {
             return;

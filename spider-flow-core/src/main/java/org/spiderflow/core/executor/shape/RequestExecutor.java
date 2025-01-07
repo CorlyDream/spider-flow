@@ -229,6 +229,8 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
                     }
                     //结果存入变量
                     variables.put("resp", response);
+                } else {
+                    logger.error("请求{}出错，状态码：{} html {}", url, response.getStatusCode(), response.getHtml());
                 }
             } catch (IOException e) {
                 successed = false;
