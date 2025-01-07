@@ -3,7 +3,6 @@ name: Package JAR
 on:
   push:
     branches:
-      - master
       - firfox-debug
     paths-ignore:
       - 'db/**'
