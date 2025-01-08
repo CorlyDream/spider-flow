@@ -127,7 +127,7 @@ public class SeleniumExecutor implements ShapeExecutor {
                     Cookie cookie = new Cookie(item.getName(), item.getValue(), item.getDomain(), item.getPath(), item.getExpiry() , false, false);
                     driver.manage().addCookie(cookie);
                 }
-                logger.debug("自动设置Cookie：{}", cookieContext);
+                logger.info("自动设置Cookie：{}", cookieContext);
             }
             //访问跳转url网站
             driver.get(url);
