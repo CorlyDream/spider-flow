@@ -143,6 +143,10 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
             SpiderNode root = context.getRootNode();
             //设置请求header
             setRequestHeader(root, request, root.getListJsonValue(HEADER_NAME, HEADER_VALUE), context, variables);
+            SpiderNode currentRootNode = context.getCurrentRootNode();
+            if (currentRootNode != root) {
+                setRequestHeader(currentRootNode, request, currentRootNode.getListJsonValue(HEADER_NAME, HEADER_VALUE), context, variables);
+            }
             setRequestHeader(node, request, node.getListJsonValue(HEADER_NAME, HEADER_VALUE), context, variables);
 
             //设置全局Cookie

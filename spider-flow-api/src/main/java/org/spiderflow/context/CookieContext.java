@@ -49,6 +49,10 @@ public class CookieContext {
         cookieDto.setDomain(domain);
         cookieDto.setPath("/");
         cookieDto.setExpiry(DateUtils.addMonths(new Date(), 1));
+        if (cookies.contains(cookieDto)) {
+            // 以最新的 cookie 为准
+            cookies.remove(cookieDto);
+        }
         cookies.add(cookieDto);
     }
 
@@ -87,7 +91,7 @@ public class CookieContext {
      * @return
      */
     private boolean domainEqual(String cookieDomain, String urlDomain) {
-        if (cookieDomain.equalsIgnoreCase(urlDomain)) {
+        if (cookieDomain.equalsIgnoreCase(urlDomain) || StringUtils.isBlank(cookieDomain)) {
             return true;
         }
         if (cookieDomain.startsWith(".")) {

@@ -359,7 +359,7 @@ public class Spider {
 	}
 
 	private void processCookie(SpiderResponse response, SpiderContext context) {
-		String value = context.getRootNode().getStringJsonValue(Constants.PERSISTENT_COOKIE);
+		String value = context.getCurrentRootNode().getStringJsonValue(Constants.PERSISTENT_COOKIE);
 		if (StringUtils.isBlank(value) || PersistentCookieEnum.NONE.name().equalsIgnoreCase(value)) {
 			return;
 		}
@@ -369,7 +369,7 @@ public class Spider {
 		}
 		String flowId = null;
 		if (PersistentCookieEnum.CURRENT.name().equalsIgnoreCase(value)) {
-			flowId = context.getFlowId();
+			flowId = context.getCurrentFlowId();
 			// 页面测试的时候，没有 flowId
 			if (StringUtils.isBlank(flowId)) {
 				flowId = "test";
@@ -382,14 +382,14 @@ public class Spider {
 	 * 处理持久化 cookie
 	 * @param context
 	 */
-	private void fillPersistentCookies(SpiderContext context){
-		String value = context.getRootNode().getStringJsonValue(Constants.PERSISTENT_COOKIE);
+	public void fillPersistentCookies(SpiderContext context){
+		String value = context.getCurrentRootNode().getStringJsonValue(Constants.PERSISTENT_COOKIE);
 		if (PersistentCookieEnum.NONE.name().equalsIgnoreCase(value)) {
 			return;
 		}
 		String flowId = null;
 		if (PersistentCookieEnum.CURRENT.name().equalsIgnoreCase(value)) {
-			flowId = context.getFlowId();
+			flowId = context.getCurrentFlowId();
 		}
 		// 页面测试的时候，没有 flowId
 		if (StringUtils.isBlank(flowId)) {

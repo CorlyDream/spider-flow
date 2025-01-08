@@ -24,6 +24,11 @@ public class SpiderContext extends HashMap<String, Object> {
      */
     private String flowId;
 
+    /**
+     * 当前流程ID
+     */
+    private String currentFlowId;
+
     private static final long serialVersionUID = 8379177178417619790L;
 
     /**
@@ -35,6 +40,13 @@ public class SpiderContext extends HashMap<String, Object> {
      * 根节点
      */
     private SpiderNode rootNode;
+
+    /**
+     * 当前流程根节点。
+     * 如果不存在子流程，则等于rootNode
+     * 如果存在子流程，则等于当前执行子流程的根节点
+     */
+    private SpiderNode currentRootNode;
 
     /**
      * 爬虫是否运行中
@@ -69,7 +81,7 @@ public class SpiderContext extends HashMap<String, Object> {
     }
 
     public void setFlowId(String flowId) {
-        this.flowId = flowId;
+        this.currentFlowId = this.flowId = flowId;
     }
 
     public LinkedBlockingQueue<Future<?>> getFutureQueue() {
@@ -101,8 +113,25 @@ public class SpiderContext extends HashMap<String, Object> {
     }
 
     public void setRootNode(SpiderNode rootNode) {
-        this.rootNode = rootNode;
+        this.currentRootNode = this.rootNode = rootNode;
         this.fillGlobalCookieList(rootNode);
+    }
+
+    public String getCurrentFlowId() {
+        return currentFlowId;
+    }
+
+    public void setCurrentFlowId(String currentFlowId) {
+        this.currentFlowId = currentFlowId;
+    }
+
+    public SpiderNode getCurrentRootNode() {
+        return currentRootNode;
+    }
+
+    public void setCurrentRootNode(SpiderNode currentRootNode) {
+        this.currentRootNode = currentRootNode;
+        this.fillGlobalCookieList(currentRootNode);
     }
 
     /**
@@ -110,7 +139,7 @@ public class SpiderContext extends HashMap<String, Object> {
      * @param node
      */
     public void fillGlobalCookieList(SpiderNode node) {
-        List<Map<String, String>> listJsonValue = rootNode.getListJsonValue(COOKIE_NAME, COOKIE_VALUE, COOKIE_DOMAIN );
+        List<Map<String, String>> listJsonValue = node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE, COOKIE_DOMAIN );
         if (listJsonValue.isEmpty()) {
             return;
         }

@@ -39,7 +39,10 @@ public class ProcessExecutor implements ShapeExecutor{
 		if(spiderFlow != null){
 			logger.info("执行子流程:{}", spiderFlow.getName());
 			SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
-			context.fillGlobalCookieList(root);
+			// 子流程更换根节点。每个流程的全局配置只在当前流程有效
+			context.setCurrentRootNode(root);
+			context.setCurrentFlowId(flowId);
+			spider.fillPersistentCookies(context);
 			spider.executeNode(null,root,context,variables);
 		}else{
 			logger.info("执行子流程:{}失败，找不到该子流程", flowId);
