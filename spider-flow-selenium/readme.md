@@ -1,4 +1,6 @@
 
+### 直接设置Cookie 说明
+
 firefox 限制 cookie 必须在同域名下才能设置，要想解除限制，需要解压 omni.ja 文件，根据关键字：InvalidCookieDomainError 删除相关代码。
 
 可以将 omni.ja 文件视为一个归档文件，类似于 ZIP 文件。要查看或修改其中的内容，你可以解压缩它：

@@ -17,6 +17,7 @@ import org.spiderflow.model.SpiderNode;
 import org.spiderflow.selenium.driver.DriverProvider;
 import org.spiderflow.selenium.io.SeleniumResponse;
 import org.spiderflow.selenium.utils.SeleniumResponseHolder;
+import org.spiderflow.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,19 +36,12 @@ public class SeleniumExecutor implements ShapeExecutor {
 
     public static final String DRIVER_TYPE = "driverType";
 
-    public static final String JAVASCRIPT_ENABLED = "javascriptEnabled";
-
-    public static final String URL = "url";
-
-    public static final String DRIVER_VAR_NAME = "$$$driver";
 
     public static final String PAGE_LOAD_TIMEOUT = "pageLoadTimeout";
 
     public static final String IMPLICITLY_WAIT_TIMEOUT = "implicitlyWaitTimeout";
 
-    public static final String PROXY = "proxy";
-
-    public static final String COOKIE_AUTO_SET = "cookie-auto-set";
+    public static final String COOKIE_DIRECT_SET = "cookie-direct-set";
 
     @Autowired
     private List<DriverProvider> driverProviders;
@@ -81,7 +75,7 @@ public class SeleniumExecutor implements ShapeExecutor {
 
     @Override
     public Object execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-        String proxy = node.getStringJsonValue(PROXY);
+        String proxy = node.getStringJsonValue(Constants.PROXY);
         String driverType = node.getStringJsonValue(DRIVER_TYPE);
         String nodeVariableName = node.getStringJsonValue(NODE_VARIABLE_NAME);
         if (StringUtils.isBlank(nodeVariableName)) {
@@ -108,17 +102,20 @@ public class SeleniumExecutor implements ShapeExecutor {
         SeleniumResponse response = null;
         WebDriver driver = null;
         try {
-            String url = engine.execute(node.getStringJsonValue(URL), variables).toString();
+            String url = engine.execute(node.getStringJsonValue(Constants.URL), variables).toString();
             logger.info("设置请求url:{}", url);
             driver = providerMap.get(driverType).getWebDriver(node, proxy);
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(NumberUtils.toInt(node.getStringJsonValue(PAGE_LOAD_TIMEOUT), 60 )));
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(NumberUtils.toInt(node.getStringJsonValue(IMPLICITLY_WAIT_TIMEOUT), 3)));
             //设置自动管理的Cookie
-            boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
+            boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(Constants.COOKIE_AUTO_SET));
+            boolean cookieDirectSet = "1".equals(node.getStringJsonValue(COOKIE_DIRECT_SET));
             CookieContext cookieContext = context.getCookieContext();
             //初始化打开浏览器
             URL tempUrl = new URL(url);
-            driver.get(getInitOpenDomain(tempUrl));
+            if (!cookieDirectSet) {
+                driver.get(getInitOpenDomain(tempUrl));
+            }
             //设置浏览器Cookies环境
             if(cookieAutoSet){
                 driver.manage().deleteAllCookies();

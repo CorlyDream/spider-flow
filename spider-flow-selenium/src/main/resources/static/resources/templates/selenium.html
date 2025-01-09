@@ -85,11 +85,12 @@
 						<div codemirror="proxy" placeholder="host:port" data-value="{{=d.data.object.proxy}}" autocomplete="off" class="layui-input-block"></div>
 					</div>
 				</div>
-				<div class="layui-col-md8">
+				<div class="layui-col-md4">
 					<div class="layui-form-item">
 						<label class="layui-form-label">请求设置</label>
 						<div class="layui-input-block">
 							<input type="checkbox" title="自动管理Cookie" value="cookie-auto-set" lay-skin="primary" {{d.data.object['cookie-auto-set'] == '0' ? '' : 'checked'}}/>
+							<input type="checkbox" title="直接设置Cookie" value="cookie-direct-set" lay-skin="primary" {{d.data.object['cookie-direct-set'] == '1' ? 'checked' : ''}}/>
 						</div>
 					</div>
 				</div>
