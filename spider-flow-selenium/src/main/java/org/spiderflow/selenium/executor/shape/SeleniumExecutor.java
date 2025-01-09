@@ -117,17 +117,17 @@ public class SeleniumExecutor implements ShapeExecutor {
             boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
             CookieContext cookieContext = context.getCookieContext();
             //初始化打开浏览器
-            driver.get(url);
+            URL tempUrl = new URL(url);
+            driver.get(getInitOpenDomain(tempUrl));
             //设置浏览器Cookies环境
             if(cookieAutoSet){
                 driver.manage().deleteAllCookies();
-                URL tempUrl = new URL(url);
                 Collection<CookieDto> setCookies = cookieContext.getUrlCookies(tempUrl);
+                logger.info("自动设置Cookie：{}", setCookies);
                 for (CookieDto item : setCookies) {
                     Cookie cookie = new Cookie(item.getName(), item.getValue(), item.getDomain(), item.getPath(), item.getExpiry() , false, false);
                     driver.manage().addCookie(cookie);
                 }
-                logger.info("自动设置Cookie：{}", cookieContext);
             }
             //访问跳转url网站
             driver.get(url);
@@ -155,4 +155,13 @@ public class SeleniumExecutor implements ShapeExecutor {
         return response;
     }
 
+    private static String getInitOpenDomain(URL url) {
+        String protocol = url.getProtocol();
+        String host = url.getHost();
+        int port = url.getPort();
+        if (port == -1) {
+            port = url.getDefaultPort();
+        }
+        return protocol + "://" + host + (port != -1 ? ":" + port : "");
+    }
 }

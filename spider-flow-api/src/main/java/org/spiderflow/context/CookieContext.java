@@ -26,12 +26,18 @@ public class CookieContext {
         return cookies.isEmpty();
     }
 
-    public void addCookie(CookieDto cookie) {
-        this.cookies.add(cookie);
+    public void addCookie(CookieDto cookieDto) {
+        if (cookies.contains(cookieDto)) {
+            // 以最新的 cookie 为准
+            cookies.remove(cookieDto);
+        }
+        cookies.add(cookieDto);
     }
 
     public void addCookies(Collection<CookieDto> cookies) {
-        this.cookies.addAll(cookies);
+        for (CookieDto cookie : cookies) {
+            this.addCookie(cookie);
+        }
     }
 
     /**
@@ -49,11 +55,7 @@ public class CookieContext {
         cookieDto.setDomain(domain);
         cookieDto.setPath("/");
         cookieDto.setExpiry(DateUtils.addMonths(new Date(), 1));
-        if (cookies.contains(cookieDto)) {
-            // 以最新的 cookie 为准
-            cookies.remove(cookieDto);
-        }
-        cookies.add(cookieDto);
+        this.addCookie(cookieDto);
     }
 
     public Collection<CookieDto> getCookies() {
@@ -90,7 +92,7 @@ public class CookieContext {
      * @param urlDomain
      * @return
      */
-    private boolean domainEqual(String cookieDomain, String urlDomain) {
+    private static boolean domainEqual(String cookieDomain, String urlDomain) {
         if (cookieDomain.equalsIgnoreCase(urlDomain) || StringUtils.isBlank(cookieDomain)) {
             return true;
         }
