@@ -132,6 +132,9 @@ public class SeleniumExecutor implements ShapeExecutor {
             //访问跳转url网站
             driver.get(url);
             response = new SeleniumResponse(driver);
+            if (response.getStatusCode() != 200) {
+                logger.error("请求出错，状态码：{} html {}", response.getStatusCode(), response.getHtml());
+            }
             SeleniumResponseHolder.add(context, response);
             if(cookieAutoSet){
                 List<CookieDto> cookieList = response.getCookieList();
