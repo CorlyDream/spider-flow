@@ -23,7 +23,6 @@
     <!-- 日志输出级别 -->
     <springProfile name="prod">
         <root level="${LOG_LEVEL}">
-            <appender-ref ref="Stdout"/>
             <appender-ref ref="File"/>
             <appender-ref ref="WebSocket"/>
         </root>
